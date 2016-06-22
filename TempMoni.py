@@ -68,6 +68,7 @@ class NotifyTool:
             logging.info('voice error {0}'.format(e))
             return 0
 
+
 class IpmiTool:
     def __init__(self, host_name):
         self.host_name = host_name
