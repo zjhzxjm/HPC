@@ -45,12 +45,13 @@ class NotifyTool:
         req.sms_template_code = "SMS_10845500"
         try:
             resp = req.getResponse()
+            logging.info('Sms send ok {0}'.format(resp))
             return 1
         except Exception as e:
-            logging.info('sms error {0}'.format(e))
+            logging.info('Sms send error {0}'.format(e))
             return 0
 
-    def voice_temp_crit(self):
+    def tts_temp_crit(self):
         logging.debug('voice config: {0} {1}, in_temp {2}'.format(self.appkey, self.secret, self.dict_temp['in_temp']))
         req = top.api.AlibabaAliqinFcTtsNumSinglecallRequest()
         req.set_app_info(top.appinfo(self.appkey, self.secret))
@@ -63,9 +64,10 @@ class NotifyTool:
         req.tts_code = "TTS_10970049"
         try:
             resp = req.getResponse()
+            logging.info('Tts voice send ok {0}'.format(resp))
             return 1
         except Exception as e:
-            logging.info('voice error {0}'.format(e))
+            logging.info('Tts voice send error {0}'.format(e))
             return 0
 
 
@@ -77,10 +79,10 @@ class IpmiTool:
         handle = os.popen('/opt/rocks/bin/rocks run host {0} "ipmitool -c sdr type temperature"'.format(self.host_name))
         for i in handle:
             if re.search('^FP', i) or re.search('^Inlet', i):
-                logging.debug('inlet line {0}'.format(i))
+                logging.debug('{1} inlet line {0}'.format(i, self.host_name))
                 in_temp = int(i.split(',')[1])
             elif re.search('^MB', i) or re.search('^Exhaust', i):
-                logging.debug('exhaust line {0}'.format(i))
+                logging.debug('{1} exhaust line {0}'.format(i, self.host_name))
                 ex_temp = int(i.split(',')[1])
         return {'in_temp': in_temp, 'ex_temp': ex_temp}
 
@@ -97,6 +99,7 @@ if __name__ == '__main__':
     ex_temp_crit = 70
     in_temp_crit = 42
     sms_done_file = '/data_center_01/home/xujm/logs/sms.done'
+    tts_done_file = '/data_center_01/home/xujm/logs/tts.done'
 
     if args.verbose:
         logging.basicConfig(
@@ -118,23 +121,27 @@ if __name__ == '__main__':
 
         # Send tts voice alert, when the temperature above critical level
         if d_temp['ex_temp'] >= ex_temp_crit or d_temp['in_temp'] >= in_temp_crit:
-            recode = obj_notify.voice_temp_crit()
-            if recode:
-                logging.info('Voice send ok: {0}'.format(recode))
-            else:
-                logging.info('Voice not send: {0}'.format(recode))
+            if not os.path.exists(tts_done_file):
+                recode = obj_notify.tts_temp_crit()
+                if recode:
+                    subprocess.call(['touch', tts_done_file])
+                    logging.debug('Touch tts.done ok: {0}'.format(recode))
+                    break
+        else:
+            if os.path.exists(tts_done_file):
+                recode = subprocess.call(['rm', tts_done_file])
+                logging.debug('Remove tts.done return code: {0}'.format(recode))
 
         # Send sms alert, when the temperature above warning level
         if d_temp['ex_temp'] >= ex_temp_warn or d_temp['in_temp'] >= in_temp_warn:
             if not os.path.exists(sms_done_file):
                 recode = obj_notify.sms_temp_warn()
                 if recode:
-                    logging.debug('Touch sms.done ok: {0}'.format(recode))
                     subprocess.call(['touch', sms_done_file])
+                    logging.debug('Touch sms.done ok: {0}'.format(recode))
                     logging.info('Temp:{0} - {1} - {2}'.format(host, d_temp['in_temp'], d_temp['ex_temp']))
                     break
-                else:
-                    logging.info('SMS not send: {0}'.format(recode))
         else:
-            recode = subprocess.call(['rm', sms_done_file])
-            logging.debug('Remove sms.done return code: {0}'.format(recode))
+            if os.path.exists(sms_done_file):
+                recode = subprocess.call(['rm', sms_done_file])
+                logging.debug('Remove sms.done return code: {0}'.format(recode))
