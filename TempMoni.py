@@ -119,13 +119,15 @@ if __name__ == '__main__':
         d_temp = obj_ipmi.get_temp()
         obj_notify = NotifyTool(smsphone, ttsphone, host, d_temp)
 
-        # Send tts voice alert, when the temperature above critical level
+        # Send tts voice and sms alert, when the temperature above critical level
         if d_temp['ex_temp'] >= ex_temp_crit or d_temp['in_temp'] >= in_temp_crit:
             if not os.path.exists(tts_done_file):
-                recode = obj_notify.tts_temp_crit()
-                if recode:
+                recode_tts = obj_notify.tts_temp_crit()
+                recode_sms = obj_notify.sms_temp_warn()
+                if recode_tts:
                     subprocess.call(['touch', tts_done_file])
                     logging.debug('Touch tts.done ok: {0}'.format(recode))
+                    logging.info('Temp:{0} - {1} - {2}'.format(host, d_temp['in_temp'], d_temp['ex_temp']))
                     break
         else:
             if os.path.exists(tts_done_file):
