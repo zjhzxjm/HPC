@@ -45,7 +45,8 @@ class NotifyTool:
         req.sms_template_code = "SMS_10845500"
         try:
             resp = req.getResponse()
-            logging.info('Sms send ok {0}'.format(resp))
+            logging.debug('Sms send ok {0}'.format(resp))
+            logging.info('Sms send ok')
             return 1
         except Exception as e:
             logging.info('Sms send error {0}'.format(e))
@@ -64,7 +65,8 @@ class NotifyTool:
         req.tts_code = "TTS_10970049"
         try:
             resp = req.getResponse()
-            logging.info('Tts voice send ok {0}'.format(resp))
+            logging.debug('Tts voice send ok {0}'.format(resp))
+            logging.info('Tts voice send ok')
             return 1
         except Exception as e:
             logging.info('Tts voice send error {0}'.format(e))
