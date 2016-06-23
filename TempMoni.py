@@ -94,9 +94,9 @@ if __name__ == '__main__':
     hosts = ['nas-0-1', 'nas-0-2', 'nas-0-3', 'nas-0-4', 'nas-0-5', 'nas-0-6', 'nas-0-7', 'nas-0-8', 'nas-0-t',
              'data-0-1', 'data-0-2', 'data-0-3', 'data-0-4', 'data-0-6', 'data-0-7',
              'nas-1-1']
-    ex_temp_warn = 50
+    ex_temp_warn = 31
     in_temp_warn = 30
-    ex_temp_crit = 70
+    ex_temp_crit = 35
     in_temp_crit = 42
     sms_done_file = '/data_center_01/home/xujm/logs/sms.done'
     tts_done_file = '/data_center_01/home/xujm/logs/tts.done'
@@ -126,7 +126,7 @@ if __name__ == '__main__':
                 recode_sms = obj_notify.sms_temp_warn()
                 if recode_tts:
                     subprocess.call(['touch', tts_done_file])
-                    logging.debug('Touch tts.done ok: {0}'.format(recode))
+                    logging.debug('Touch tts.done ok: {0}'.format(recode_tts))
                     logging.info('Temp:{0} - {1} - {2}'.format(host, d_temp['in_temp'], d_temp['ex_temp']))
                     break
         else:
