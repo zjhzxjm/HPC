@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 """
 Author: xujm@realbio.cn
-Ver:2.0
+Ver2.0.1
+Add critical alert also send sms
+Ver:2.0.0
 Add tts voice alert when the temperature above the critical level
-Ver:1.0
+Ver:1.0.0
 init
 """
 
@@ -20,7 +22,7 @@ parser = argparse.ArgumentParser(description="")
 parser.add_argument('-s', '--smsphone', dest='smsphone', type=str, help='Send sms alert to this phone', required=True)
 parser.add_argument('-t', '--ttsphone', dest='ttsphone', type=str, help='Send voice alert to this phone', required=True)
 parser.add_argument('-v', '--verbose', action='store_true', dest='verbose', help='Enable debug info')
-parser.add_argument('--version', action='version', version='2.0')
+parser.add_argument('--version', action='version', version='2.0.1')
 
 
 class NotifyTool:
