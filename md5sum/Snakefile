@@ -1,0 +1,17 @@
+import os
+FILES, = glob_wildcards("{file}.md5")
+
+rule all:
+    input:
+        expand("{file}.md5.ck", file=FILES)
+
+rule md5sum:
+    input:
+        "{file}.md5"
+    output:
+        "{file}.md5.ck"
+    run:
+        md5_path = os.path.dirname(os.path.abspath(wildcards.file))
+        md5file = str(list({input})[0]).split("/")[-1]
+        md5ck = str(list({output})[0]).split("/")[-1]
+        shell("cd {md5_path};md5sum -c {md5file} > {md5ck}")
