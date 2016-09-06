@@ -1,6 +1,6 @@
 # HPC
 
-TempMoni.py
+TempMoni.py 【软著字第1402744号】
 
 Send tts voice alert, when the temperature above critical level
 
